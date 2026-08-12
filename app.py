@@ -10,8 +10,14 @@ Punto de entrada de la app Streamlit con las pestañas:
 - Chat RAG
 """
 
+from pathlib import Path
+
 import streamlit as st
 from paginas import chat, habilidades, ofertas, pais, remoto, salarios, vision
+
+RAIZ = Path(__file__).resolve().parent
+HEADER = RAIZ / "assets" / "header.png"
+LOGO = RAIZ / "assets" / "logo.png"
 
 st.set_page_config(
     page_title="DataJobs Radar",
@@ -19,18 +25,19 @@ st.set_page_config(
     layout="wide",
 )
 
+st.logo(str(LOGO))
+
 paginas = {
-    "Visión general": vision.pagina,
-    "Habilidades": habilidades.pagina,
-    "Salarios": salarios.pagina,
-    "Ofertas remotas": remoto.pagina,
-    "Mercado por país": pais.pagina,
-    "Explorar ofertas": ofertas.pagina,
-    "Chat RAG": chat.pagina,
+    ":material/space_dashboard: Visión general": vision.pagina,
+    ":material/troubleshoot: Habilidades": habilidades.pagina,
+    ":material/paid: Salarios": salarios.pagina,
+    ":material/laptop_mac: Ofertas remotas": remoto.pagina,
+    ":material/public: Mercado por país": pais.pagina,
+    ":material/table_chart: Explorar ofertas": ofertas.pagina,
+    ":material/chat: Chat RAG": chat.pagina,
 }
 
 with st.sidebar:
-    st.title("DataJobs Radar")
     st.caption("¿Qué buscan las empresas al contratar Data Analysts?")
     st.divider()
     seleccion = st.radio(
@@ -40,5 +47,8 @@ with st.sidebar:
     )
     st.divider()
     st.caption("Datos: API de Adzuna · España + Europa · SQLite + Chroma")
+
+if HEADER.exists():
+    st.image(str(HEADER), width="stretch")
 
 paginas[seleccion]()
