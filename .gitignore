@@ -1,0 +1,21 @@
+# entornos y caches
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# secretos y claves
+secrets.toml
+.env
+
+# datos generados
+datos.db
+chroma_db/
+data/
+
+# jupyter
+.ipynb_checkpoints/
+
+# misc
+.DS_Store
+Thumbs.db
