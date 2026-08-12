@@ -107,7 +107,6 @@ ROLES = {
                    "power bi developer", "business analyst"],
     "Data Scientist": ["data scientist", "científico de datos", "cientifico de datos"],
     "Data Engineer": ["data engineer", "ingeniero de datos", "ingeniero de datos"],
-    "Data Analyst": ["data analyst", "analista de datos", "analista de da"],
 }
 
 # Prioridad para asignar rol cuando coinciden varias variantes.
