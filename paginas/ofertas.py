@@ -34,9 +34,9 @@ def pagina() -> None:
     vista = df.copy()
     if busqueda:
         mascara = (
-            vista["title"].str.contains(busqueda, case=False, na=False)
-            | vista["company"].str.contains(busqueda, case=False, na=False)
-            | vista["description"].str.contains(busqueda, case=False, na=False)
+            vista["title"].str.contains(busqueda, case=False, na=False, regex=False)
+            | vista["company"].str.contains(busqueda, case=False, na=False, regex=False)
+            | vista["description"].str.contains(busqueda, case=False, na=False, regex=False)
         )
         vista = vista[mascara]
     if rol_sel != "Todos":
