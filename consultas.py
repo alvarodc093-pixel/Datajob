@@ -45,9 +45,13 @@ def cargar_ofertas(filtro_pais: list[str] | None = None,
 def resumen(df: pd.DataFrame) -> dict:
     """KPIs basicos del dataset (puede estar filtrado)."""
     con_salario = df.dropna(subset=["salary_min"]).copy()
+    con_salario_eur = (
+        con_salario[con_salario["salary_currency"] == "EUR"]
+        if not con_salario.empty else con_salario
+    )
     sal_medio = (
-        ((con_salario["salary_min"] + con_salario["salary_max"]) / 2)
-        if not con_salario.empty else pd.Series(dtype=float)
+        ((con_salario_eur["salary_min"] + con_salario_eur["salary_max"]) / 2)
+        if not con_salario_eur.empty else pd.Series(dtype=float)
     )
     return {
         "ofertas": len(df),
