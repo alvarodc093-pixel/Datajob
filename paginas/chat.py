@@ -8,6 +8,8 @@ recuperados de Chroma (modo "datos").
 """
 
 import os
+import tomllib
+from pathlib import Path
 
 import chromadb
 import streamlit as st
@@ -15,6 +17,19 @@ from openai import OpenAI
 
 DB_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db")
 COLLECTION = "ofertas"
+
+
+def _config_ollama() -> dict:
+    """Config de Ollama desde st.secrets o el secrets.toml del proyecto."""
+    cfg = st.secrets.get("ollama") or {}
+    if not cfg.get("base_url"):
+        ruta = Path(__file__).resolve().parent.parent / "secrets.toml"
+        try:
+            with ruta.open("rb") as f:
+                cfg = tomllib.load(f).get("ollama") or {}
+        except (OSError, tomllib.TOMLDecodeError):
+            cfg = {}
+    return cfg
 
 SUGERENCIAS = {
     ":blue[:material/query_stats:] ¿Qué habilidades piden más?": (
@@ -36,8 +51,9 @@ def obtener_coleccion():
 
 @st.cache_resource
 def obtener_cliente_llm() -> tuple[OpenAI | None, str]:
-    base_url = st.secrets.get("ollama", {}).get("base_url")
-    model = st.secrets.get("ollama", {}).get("model")
+    cfg = _config_ollama()
+    base_url = cfg.get("base_url")
+    model = cfg.get("model")
     if not base_url or not model:
         return None, ""
     try:
