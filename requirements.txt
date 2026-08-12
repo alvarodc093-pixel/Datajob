@@ -1,0 +1,7 @@
+streamlit>=1.40
+pandas>=2.2
+requests>=2.31
+plotly>=5.20
+chromadb>=0.5
+openai>=1.30
+python-dotenv>=1.0
