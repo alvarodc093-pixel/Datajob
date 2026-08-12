@@ -52,7 +52,7 @@ def pagina() -> None:
             contratos = df["contract_type"].fillna("No especificado").value_counts()
             if not contratos.empty:
                 fig = px.pie(contratos, names=contratos.index,
-                             hole=0.4)
+                             values=contratos.values, hole=0.4)
                 fig.update_layout(height=420, margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, width="stretch")
             else:
