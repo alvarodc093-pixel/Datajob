@@ -70,7 +70,7 @@ Extraemos skills de títulos y descripciones con `skills.py`.""")
 code("""from skills import detectar_skills
 
 df["skills"] = df.apply(
-    lambda r: detectar_skills(r["title"] + " " + r["description"]), axis=1)
+    lambda r: detectar_skills(str(r["title"]) + " " + str(r["description"])), axis=1)
 
 from collections import Counter
 conteo = Counter(s for lista in df["skills"] for s in lista)
