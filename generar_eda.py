@@ -129,14 +129,16 @@ print(sal_euro.dropna(subset=["rol"]).groupby("rol")["salario_medio"]
 md("""## 4. Comparativa de roles""")
 
 code("""vol = df["rol"].value_counts()
-fig = px.pie(vol, names=vol.index, title="Distribución de roles en las ofertas")
+fig = px.pie(vol, names=vol.index, values=vol.values,
+             title="Distribución de roles en las ofertas")
 fig.show()
 vol""")
 
 md("""## 5. Ofertas remotas""")
 
 code("""rem = df["remote"].value_counts()
-fig = px.pie(rem, names=["No", "Sí"], title="Ofertas remotas",
+fig = px.pie(rem, names=["No", "Sí"], values=rem.values,
+             title="Ofertas remotas",
              hole=0.4, color_discrete_sequence=["#c7d4e0", "#2b6cb0"])
 fig.show()
 print(f"Remotas: {int(rem.get(1, 0))} de {len(df)} "
