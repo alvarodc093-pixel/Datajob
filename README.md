@@ -118,10 +118,13 @@ Datajob Radar/
   (remote, teletrabajo, work from home, etc.).
 - **Modelo de embeddings**: Chroma descarga automáticamente `all-MiniLM-L6-v2`
   (79 MB) la primera vez que se indexa.
-- **Despliegue en Streamlit Cloud**: la parte de datos funciona; el chat usa
-  Ollama local para embeddings/generación, que no existe en la nube. Para
-  desplegar con chat haría falta un proveedor de embeddings/generación en la
-  nube (reto avanzado).
+- **Despliegue**: la app necesita `datos.db`, que no está en el repo porque
+  sale de la API de Adzuna con claves propias. Los embeddings los calcula Chroma
+  en local; solo la generación de respuestas usa Ollama. Sin Ollama el chat
+  devuelve las ofertas recuperadas en lugar de una respuesta redactada.
+- **Notebook**: se guarda sin salidas por el mismo motivo (los datos no se
+  publican). Las cifras del resumen final salen de ejecutarlo sobre 1.202
+  ofertas descargadas en agosto de 2026.
 
 ## Licencia y créditos
 

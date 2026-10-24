@@ -40,12 +40,12 @@ SKILLS = {
     "probability": ["probability", "probabilidad"],
     "hypothesis testing": ["hypothesis test", "ab testing", "a/b testing",
                            "statistical test", "pruebas estad"],
-    "machine learning": ["machine learning", "ml", "modelos", "modelos de ml",
+    "machine learning": ["machine learning", "ml", "modelos de ml",
                          "modelos predictivos"],
     "deep learning": ["deep learning", "redes neuronales", "neural network"],
     "data visualization": ["data visualization", "visualization", "visualisation",
                            "visualización", "visualizacion", "dashboards",
-                           "dashboarding", "reporting", "powerpoint"],
+                           "dashboarding", "reporting"],
     "etl": ["etl", "data pipeline", "pipelines de datos", "data pipelines"],
     "data warehousing": ["data warehouse", "data warehousing", "almacén de datos",
                          "almacen de datos", "olap"],
@@ -54,7 +54,7 @@ SKILLS = {
     "git": ["git", "github", "gitlab", "bitbucket"],
     "docker": ["docker", "kubernetes", "k8s", "containers", "contenedores"],
     "ci/cd": ["ci/cd", "jenkins", "devops", "terraform"],
-    "rest apis": ["api", "apis", "rest", "graphql", "restful"],
+    "rest apis": ["api", "apis", "rest api", "graphql", "restful"],
     "mongodb": ["mongodb", "mongo"],
     "postgresql": ["postgres", "postgresql"],
     "mysql": ["mysql", "mariadb"],
@@ -75,7 +75,8 @@ SKILLS = {
                         "capacidad analítica", "capacidad analitica",
                         "critical thinking", "pensamiento crítico",
                         "pensamiento critico"],
-    "business acumen": ["business acumen", "business intelligence",
+    # "business intelligence" no cuenta aquí: es el nombre del rol, no una habilidad.
+    "business acumen": ["business acumen",
                         "understanding of the business", "domain knowledge",
                         "business context"],
     "project management": ["project management", "gestión de proyectos",
@@ -106,35 +107,32 @@ ROLES = {
     "BI Analyst": ["bi analyst", "business intelligence analyst",
                    "power bi developer", "business analyst"],
     "Data Scientist": ["data scientist", "científico de datos", "cientifico de datos"],
-    "Data Engineer": ["data engineer", "ingeniero de datos", "ingeniero de datos"],
+    "Data Engineer": ["data engineer", "ingeniero de datos"],
 }
 
 # Prioridad para asignar rol cuando coinciden varias variantes.
 ROLE_ORDER = ["Data Scientist", "Data Engineer", "BI Analyst", "Data Analyst"]
 
 
-def _regex_variante(v: str) -> re.Pattern:
-    """Convierte una variante en regex con limites de palabra.
+def _regex_skill(variantes: list[str]) -> re.Pattern:
+    """Une las variantes de un skill en una regex con limites de palabra.
 
     Variantes de varias palabras (p.ej. "power bi") mantienen el espacio
     como separador de palabras, lo que evita falsos positivos tipo "digital".
     """
-    return re.compile(r"\b" + re.escape(v) + r"\b", re.IGNORECASE)
+    alternativas = "|".join(re.escape(v) for v in variantes)
+    return re.compile(r"\b(?:" + alternativas + r")\b", re.IGNORECASE)
+
+
+# Se compilan una sola vez: detectar_skills se llama para cada oferta.
+_PATRONES = {skill: _regex_skill(v) for skill, v in SKILLS.items()}
 
 
 def detectar_skills(texto: str) -> list[str]:
     """Devuelve la lista de skills canonicos presentes en un texto."""
     if not texto:
         return []
-    encontrados = []
-    for skill, variantes in SKILLS.items():
-        if skill in encontrados:
-            continue
-        for v in variantes:
-            if _regex_variante(v).search(texto):
-                encontrados.append(skill)
-                break
-    return encontrados
+    return [skill for skill, patron in _PATRONES.items() if patron.search(texto)]
 
 
 def detectar_rol(titulo: str) -> str | None:

@@ -78,24 +78,10 @@ def recuperar(coleccion, pregunta: str, k: int) -> list[dict]:
 
 
 def formato_contexto(resultados: list[dict]) -> str:
-    lineas = []
-    for i, r in enumerate(resultados, 1):
-        m = r["metadatos"] or {}
-        titulo = m.get("titulo", "?")
-        empresa = m.get("empresa", "?")
-        pais = m.get("pais_nombre", m.get("pais", "?"))
-        remoto = "Sí" if m.get("remoto") == 1 else "No"
-        salario = ""
-        if m.get("salary_min") or m.get("salary_max"):
-            smin = m.get("salary_min") or "?"
-            smax = m.get("salary_max") or "?"
-            salario = f" | Salario: {smin}-{smax} {m.get('moneda', '')}"
-        ubicacion = m.get("ubicacion", "?")
-        lineas.append(
-            f"[{i}] {titulo} - {empresa} | {ubicacion} | Remoto: {remoto}"
-            f"{salario}\n{m.get('documento', '')}\n"
-        )
-    return "\n".join(lineas)
+    # Cada documento ya es la ficha completa de preparar_corpus.py: titulo,
+    # empresa, ubicacion, salario, remoto y descripcion.
+    return "\n\n".join(f"[{i}] {r['documento']}"
+                       for i, r in enumerate(resultados, 1))
 
 
 def generar_respuesta(pregunta: str, contexto: str,
@@ -162,6 +148,7 @@ def pagina() -> None:
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
 
+    sugerencia = None
     if not st.session_state.messages:
         seleccion = st.pills(
             "Prueba a preguntar:",
@@ -169,13 +156,11 @@ def pagina() -> None:
             label_visibility="collapsed",
         )
         if seleccion:
-            prompt = SUGERENCIAS[seleccion]
-            st.session_state.messages.append(
-                {"role": "user", "content": prompt})
-            st.rerun()
+            sugerencia = SUGERENCIAS[seleccion]
 
+    # Una sugerencia pulsada sigue el mismo camino que una pregunta escrita.
     prompt = st.chat_input(
-        "Pregunta sobre las ofertas...", submit_mode="disable")
+        "Pregunta sobre las ofertas...", submit_mode="disable") or sugerencia
 
     if prompt:
         st.session_state.messages.append(

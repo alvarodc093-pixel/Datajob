@@ -194,21 +194,23 @@ print(rem_rol.round(1).to_string())""")
 
 md("""### Resumen ejecutivo
 
-- **Habilidades**: Power BI y machine learning lideran (116 ofertas cada una),
-  seguidas de visualización de datos (105), SQL (48) y Python (43). Ojo: Adzuna
-  solo devuelve fragmentos de descripción, así que SQL/Python probablemente
-  están infrarrepresentados en estas búsquedas concretas.
+- **Habilidades**: Power BI (116 ofertas), machine learning (114) y visualización
+  de datos (104) encabezan la lista, seguidas de SQL (48) y Python (43). Machine
+  learning sale casi siempre en ofertas de Data Scientist (79 de 114); en las de
+  Data Analyst solo aparece en 10, mientras que Power BI aparece en 48. Ojo: Adzuna
+  solo devuelve los primeros 500 caracteres de la descripción, así que SQL y Python
+  probablemente están infrarrepresentados.
 - **Salario**: mediana de ~56.500 €/año en Europa; Alemania lidera (77.500 €) e
-  Italia es la más baja (30.650 €).
+  Italia es la más baja (30.650 €). Solo 213 de 1.202 ofertas publican salario.
 - **Roles**: Data Scientist paga más (70.000 €), seguido de Data Engineer
   (52.800 €), Data Analyst (45.493 €) y BI Analyst (41.250 €).
 - **Remoto**: solo el 5,4% de las ofertas son remotas; Data Analyst es el rol
   con mayor porcentaje (6,9%).
-- **Geografía**: España tiene el mayor volumen de ofertas (182), seguida de
-  Francia (150) y Polonia (149).
-- **Recomendación**: para ser Data Analyst, el combo SQL + Python + Power BI /
-  Tableau + visualización + estadística es la base; el salario y el remoto
-  dependen mucho del país y del rol objetivo.""")
+- **Geografía**: España tiene el mayor volumen de ofertas (185), seguida de
+  Polonia (169) y Alemania (157).
+- **Recomendación**: para ser Data Analyst, la base es SQL + Python + Power BI /
+  Tableau + visualización + estadística. El salario y el remoto dependen mucho
+  del país y del rol objetivo.""")
 
 with open("notebooks/eda.ipynb", "w", encoding="utf-8") as f:
     nbf.write(nb, f)

@@ -13,6 +13,7 @@ Punto de entrada de la app Streamlit con las pestañas:
 from pathlib import Path
 
 import streamlit as st
+from consultas import DB_PATH
 from paginas import chat, habilidades, ofertas, pais, remoto, salarios, vision
 
 RAIZ = Path(__file__).resolve().parent
@@ -50,5 +51,12 @@ with st.sidebar:
 
 if HEADER.exists():
     st.image(str(HEADER), width="stretch")
+
+if not DB_PATH.exists():
+    st.error(
+        "No existe `datos.db`. Ejecuta primero `python ingesta.py` con tus "
+        "claves de Adzuna en `secrets.toml` (ver README)."
+    )
+    st.stop()
 
 paginas[seleccion]()
