@@ -38,7 +38,7 @@ SUGERENCIAS = {
         "¿Cuánto se ofrece de salario en Alemania para data analyst?"),
     ":orange[:material/home_work:] ¿Hay ofertas remotas?": (
         "¿Qué porcentaje de ofertas son remotas y para qué roles?"),
-    ":purple[:material/school:] ¿Qué debería aprender?": (
+    ":violet[:material/school:] ¿Qué debería aprender?": (
         "¿Qué skills debería aprender alguien que quiere ser data analyst?"),
 }
 
