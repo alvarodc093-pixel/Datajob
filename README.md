@@ -5,6 +5,10 @@ empleo reales (España + Europa) desde la API de [Adzuna](https://developer.adzu
 las guarda en SQLite, las analiza en un notebook y las presenta en una app
 Streamlit con **chat RAG** sobre tus propios datos.
 
+**Demo:** https://datajobs-radar.vercel.app (1.202 ofertas descargadas en agosto
+de 2026; la app se ejecuta en el navegador con [stlite](https://github.com/whitphx/stlite)
+y la primera carga tarda unos 20-30 segundos).
+
 ## El problema que resuelve
 
 Mirando ofertas reales, la app responde preguntas como:
@@ -95,6 +99,8 @@ Datajob Radar/
 ├── consultas.py             acceso a datos para app y EDA
 ├── generar_eda.py           genera notebooks/eda.ipynb
 ├── datos.db                 la base SQLite (se genera al ejecutar ingesta)
+├── data/ofertas_demo.db     copia de las ofertas para la demo (sin caché ni claves)
+├── index.html               demo web (stlite)
 ├── diccionario_datos.md     documentación de columnas y tablas
 ├── notebooks/
 │   └── eda.ipynb            análisis exploratorio con conclusiones
@@ -118,14 +124,16 @@ Datajob Radar/
   (remote, teletrabajo, work from home, etc.).
 - **Modelo de embeddings**: Chroma descarga automáticamente `all-MiniLM-L6-v2`
   (79 MB) la primera vez que se indexa.
-- **Despliegue**: la app necesita `datos.db`, que no está en el repo porque
-  sale de la API de Adzuna con claves propias. Los embeddings los calcula Chroma
-  en local; solo la generación de respuestas usa Ollama. Sin Ollama el chat
-  devuelve las ofertas recuperadas en lugar de una respuesta redactada.
-- **Notebook**: se guarda sin salidas por el mismo motivo (los datos no se
-  publican). Las cifras del resumen final salen de ejecutarlo sobre 1.202
-  ofertas descargadas en agosto de 2026.
+- **Chat**: en local, los embeddings los calcula Chroma y la generación usa
+  Ollama; sin Ollama el chat devuelve las ofertas recuperadas. En la demo web no
+  hay Chroma ni LLM: responde a las preguntas de habilidades, salarios y remoto
+  con cifras calculadas sobre las ofertas.
+- **Demo**: usa `data/ofertas_demo.db`, una copia de las ofertas sin la caché de
+  la API y con los enlaces sin parámetros de seguimiento. Son ofertas de agosto de
+  2026, así que muchos enlaces ya habrán caducado.
+- **Notebook**: se guarda sin salidas; las cifras del resumen final salen de
+  ejecutarlo sobre las 1.202 ofertas.
 
 ## Licencia y créditos
 
-Datos de empleo: [Adzuna API](https://developer.adzuna.com). Uso académico.
+Datos de empleo: [Jobs by Adzuna](https://www.adzuna.es) ([API](https://developer.adzuna.com)). Uso académico.

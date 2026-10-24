@@ -47,7 +47,7 @@ with st.sidebar:
         label_visibility="collapsed",
     )
     st.divider()
-    st.caption("Datos: API de Adzuna · España + Europa · SQLite + Chroma")
+    st.caption("Datos: [Jobs by Adzuna](https://www.adzuna.es) · ofertas de agosto de 2026 · España + Europa")
 
 if HEADER.exists():
     st.image(str(HEADER), width="stretch")

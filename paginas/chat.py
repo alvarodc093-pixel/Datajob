@@ -4,16 +4,27 @@ Chat que responde preguntas sobre las ofertas usando Chroma (recuperacion)
 + un LLM local via Ollama (generacion).
 
 Sin Ollama, el chat sigue funcionando: responde solo con los datos
-recuperados de Chroma (modo "datos").
+recuperados de Chroma (modo "datos"). Sin Chroma (demo web con stlite),
+responde con cifras calculadas sobre las ofertas.
 """
 
 import os
 import tomllib
 from pathlib import Path
 
-import chromadb
+from collections import Counter
+
 import streamlit as st
-from openai import OpenAI
+
+from consultas import PAISES, cargar_ofertas
+from skills import detectar_rol, detectar_skills
+
+try:
+    import chromadb
+    from openai import OpenAI
+except ImportError:  # demo web (stlite): sin Chroma ni cliente de LLM
+    chromadb = None
+    OpenAI = None
 
 DB_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_db")
 COLLECTION = "ofertas"
@@ -50,7 +61,9 @@ def obtener_coleccion():
 
 
 @st.cache_resource
-def obtener_cliente_llm() -> tuple[OpenAI | None, str]:
+def obtener_cliente_llm():
+    if OpenAI is None:
+        return None, ""
     cfg = _config_ollama()
     base_url = cfg.get("base_url")
     model = cfg.get("model")
@@ -75,6 +88,54 @@ def recuperar(coleccion, pregunta: str, k: int) -> list[dict]:
     metas = (resultados.get("metadatas") or [[]])[0]
     return [{"documento": d, "metadatos": m}
             for d, m in zip(docs, metas) if d]
+
+
+def respuesta_con_datos(pregunta: str, k: int) -> str:
+    """Modo sin Chroma: responde a las preguntas típicas con cifras de las ofertas."""
+    p = pregunta.lower()
+    df = cargar_ofertas()
+    pais = next((c for c, n in PAISES.items() if n.lower() in p), None)
+    if pais:
+        df = df[df["country"] == pais]
+    ambito = f" en {PAISES[pais]}" if pais else ""
+    if df.empty:
+        return "No hay ofertas para ese país."
+
+    if any(w in p for w in ("salario", "sueldo", "paga", "cobra")):
+        sal = df.dropna(subset=["salary_min", "salary_max"])
+        sal = sal[sal["salary_currency"] == "EUR"]
+        if sal.empty:
+            return f"Ninguna oferta{ambito} publica salario en euros."
+        medio = (sal["salary_min"] + sal["salary_max"]) / 2
+        por_rol = medio.groupby(sal["title"].map(detectar_rol)).median().dropna()
+        lineas = [f"- {rol}: {v:,.0f} €".replace(",", ".") for rol, v in por_rol.sort_values(ascending=False).items()]
+        return (f"Mediana salarial{ambito}: **{medio.median():,.0f} €/año**".replace(",", ".")
+                + f" ({len(sal)} ofertas con salario en euros).\n\n" + "\n".join(lineas))
+
+    if any(w in p for w in ("remot", "teletrabajo", "casa")):
+        roles = df["title"].map(detectar_rol)
+        pct = df.groupby(roles)["remote"].mean().mul(100).sort_values(ascending=False)
+        lineas = [f"- {rol}: {v:.1f} %" for rol, v in pct.items()]
+        return (f"**{df['remote'].mean() * 100:.1f} %** de las ofertas{ambito} son remotas "
+                f"({int(df['remote'].sum())} de {len(df)}).\n\n" + "\n".join(lineas))
+
+    if any(w in p for w in ("habilidad", "skill", "aprender", "tecnolog", "piden")):
+        analistas = df[df["title"].map(detectar_rol).isin(["Data Analyst", "BI Analyst"])]
+        base = analistas if not analistas.empty else df
+        conteo = Counter(s for t, d in zip(base["title"], base["description"].fillna(""))
+                         for s in detectar_skills(f"{t} {d}"))
+        lineas = [f"{i}. {s}: {n} ofertas" for i, (s, n) in enumerate(conteo.most_common(8), 1)]
+        return (f"Habilidades más pedidas en {len(base)} ofertas de Data/BI Analyst{ambito}:\n\n"
+                + "\n".join(lineas))
+
+    palabras = [w for w in p.replace("?", " ").replace("¿", " ").split() if len(w) > 3]
+    texto = (df["title"] + " " + df["description"].fillna("")).str.lower()
+    mascara = texto.apply(lambda t: all(w in t for w in palabras)) if palabras else texto.astype(bool)
+    encontradas = df[mascara].head(k)
+    if encontradas.empty:
+        return "No he encontrado ofertas relacionadas. Prueba con habilidades, salarios, remoto o un país."
+    lineas = [f"- {r.title} · {r.company} · {r.location_display}" for r in encontradas.itertuples()]
+    return f"Ofertas relacionadas{ambito}:\n\n" + "\n".join(lineas)
 
 
 def formato_contexto(resultados: list[dict]) -> str:
@@ -135,14 +196,16 @@ def pagina() -> None:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    try:
-        coleccion = obtener_coleccion()
-    except Exception:
-        st.warning(
-            "No hay colección Chroma. Ejecuta primero: "
-            "`python preparar_corpus.py`"
-        )
-        coleccion = None
+    coleccion = None
+    if chromadb is None:
+        st.info("Versión web: el chat responde con cifras calculadas sobre las "
+                "ofertas (sin búsqueda semántica ni LLM).")
+    else:
+        try:
+            coleccion = obtener_coleccion()
+        except Exception:
+            st.info("No hay colección Chroma (`python preparar_corpus.py`); "
+                    "el chat responde con cifras calculadas sobre las ofertas.")
 
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
@@ -170,24 +233,20 @@ def pagina() -> None:
 
         with st.chat_message("assistant"):
             if coleccion is None:
-                st.write("No hay datos indexados todavía.")
+                respuesta = respuesta_con_datos(prompt, k)
             else:
                 resultados = recuperar(coleccion, prompt, k)
                 if not resultados:
-                    st.write(
-                        "No he encontrado ofertas relacionadas. Prueba a "
-                        "preguntar sobre habilidades, salarios, remoto o país.")
+                    respuesta = ("No he encontrado ofertas relacionadas. Prueba a "
+                                 "preguntar sobre habilidades, salarios, remoto o país.")
                 else:
-                    contexto = formato_contexto(resultados)
                     respuesta = generar_respuesta(
-                        prompt, contexto, st.session_state.messages[:-1])
-                    if isinstance(respuesta, str):
-                        st.write(respuesta)
-                        st.session_state.messages.append(
-                            {"role": "assistant", "content": respuesta})
-                    else:
-                        texto = st.write_stream(respuesta)
-                        st.session_state.messages.append(
-                            {"role": "assistant", "content": texto})
+                        prompt, formato_contexto(resultados), st.session_state.messages[:-1])
+            if isinstance(respuesta, str):
+                st.write(respuesta)
+            else:
+                respuesta = st.write_stream(respuesta)
+            st.session_state.messages.append(
+                {"role": "assistant", "content": respuesta})
 
         st.rerun()

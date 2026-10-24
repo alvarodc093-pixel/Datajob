@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DataJobs Radar</title>
+  <meta name="description" content="Qué piden las empresas a un Data Analyst: ofertas reales de Adzuna analizadas con Streamlit, ejecutado en el navegador con stlite.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.11.0/build/stlite.css">
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; background: #0E1B2C; }
+    #carga { padding: 48px 24px; text-align: center; color: #B9CBE0; }
+  </style>
+</head>
+<body>
+  <div id="root"><p id="carga">Cargando la app en tu navegador (la primera vez tarda unos 20-30 segundos)…</p></div>
+  <script type="module">
+    // La app de Streamlit se ejecuta entera en el navegador con stlite (Pyodide).
+    // En producción el código y la base se leen de la rama main de GitHub.
+    // Chroma no funciona en el navegador: el chat responde con cifras calculadas.
+    import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@1.11.0/build/stlite.js";
+    const local = ["localhost", "127.0.0.1"].includes(location.hostname);
+    const base = local ? "" : "https://raw.githubusercontent.com/alvarodc093-pixel/Datajob/main/";
+    const codigo = ["app.py", "consultas.py", "skills.py", "paginas/__init__.py", "paginas/comunes.py",
+                    "paginas/vision.py", "paginas/habilidades.py", "paginas/salarios.py", "paginas/remoto.py",
+                    "paginas/pais.py", "paginas/ofertas.py", "paginas/chat.py",
+                    "assets/header.png", "assets/logo.png"];
+    const files = Object.fromEntries(codigo.map((f) => [f, { url: base + f }]));
+    // El tema se mantiene, pero sin las fuentes web personalizadas: stlite falla al cargarlas.
+    const tema = await (await fetch(base + ".streamlit/config.toml")).text();
+    files[".streamlit/config.toml"] = { data: tema.split("\n").filter((l) => !/^(font|codeFont)\s*=/.test(l)).join("\n") + "\n[client]\ntoolbarMode = \"viewer\"\n" };
+    files["datos.db"] = { url: base + "data/ofertas_demo.db" };
+    mount({ requirements: ["pandas", "plotly", "sqlite3"], entrypoint: "app.py", files }, document.getElementById("root"));
+  </script>
+</body>
+</html>

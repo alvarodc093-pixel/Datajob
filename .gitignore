@@ -11,7 +11,8 @@ secrets.toml
 # datos generados
 datos.db
 chroma_db/
-data/
+data/*
+!data/ofertas_demo.db
 
 # jupyter
 .ipynb_checkpoints/

@@ -42,7 +42,8 @@ def pagina() -> None:
     if rol_sel != "Todos":
         vista = vista[vista["rol"] == rol_sel]
 
-    st.caption(f"{len(vista)} ofertas en la vista actual.")
+    st.caption(f"{len(vista)} ofertas en la vista actual. Se descargaron en agosto de 2026, "
+               "así que muchos enlaces ya habrán caducado.")
 
     columnas = ["title", "company", "pais_nombre", "location_display",
                 "salary_min", "salary_max", "salary_currency",
