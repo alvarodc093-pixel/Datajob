@@ -1,15 +1,21 @@
-# DataJobs Radar — ¿Qué buscan realmente las empresas cuando contratan Data Analysts?
+# DataJobs Radar
 
-Proyecto de verano: un **producto de datos completo** que descarga ofertas de
-empleo reales (España + Europa) desde la API de [Adzuna](https://developer.adzuna.com),
-las guarda en SQLite, las analiza en un notebook y las presenta en una app
-Streamlit con **chat RAG** sobre tus propios datos.
+**Qué piden realmente las empresas a un Data Analyst: habilidades, salarios y teletrabajo en 1.202 ofertas reales de España y Europa.**
 
-**Demo:** https://datajobs-radar.vercel.app (1.202 ofertas descargadas en agosto
-de 2026; la app se ejecuta en el navegador con [stlite](https://github.com/whitphx/stlite)
-y la primera carga tarda unos 20-30 segundos).
+[![Demo](https://img.shields.io/badge/Demo-en%20vivo-2ea44f?style=flat-square)](https://datajobs-radar.vercel.app) ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white) ![SQLite](https://img.shields.io/badge/SQLite-datos-003B57?style=flat-square&logo=sqlite&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-app-FF4B4B?style=flat-square&logo=streamlit&logoColor=white) ![ChromaDB](https://img.shields.io/badge/ChromaDB-RAG-5A3FC0?style=flat-square)
+
+![Visión general de DataJobs Radar](docs/img/vision.png)
+
+## En resumen
+
+- **Problema:** quien quiere trabajar como Data Analyst no sabe qué herramientas priorizar ni qué salario esperar en cada país.
+- **Datos:** 1.202 ofertas de la API de Adzuna (agosto de 2026) en 9 países, guardadas en SQLite con caché de peticiones.
+- **Resultado:** Power BI y la visualización de datos son lo más pedido en ofertas de Data Analyst; la mediana salarial ronda los 56.500 €/año y solo el 5,4 % de las ofertas es remota.
+- **App:** 7 secciones en Streamlit (habilidades, salarios, remoto, países, explorador y chat RAG) que funcionan directamente en el navegador.
 
 ## El problema que resuelve
+
+![Habilidades más demandadas](docs/img/habilidades.png)
 
 Mirando ofertas reales, la app responde preguntas como:
 
