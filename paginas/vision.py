@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from paginas.comunes import filtros_basicos
+from paginas.comunes import barra_h, filtros_basicos
 
 
 def pagina() -> None:
@@ -39,8 +39,7 @@ def pagina() -> None:
             conteo = (df["pais_nombre"].value_counts()
                       .sort_values(ascending=True))
             if not conteo.empty:
-                fig = px.bar(conteo, orientation="h",
-                             labels={"value": "Ofertas", "index": "País"})
+                fig = barra_h(conteo, "Ofertas", "País")
                 fig.update_layout(height=420, margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, width="stretch")
             else:
@@ -49,7 +48,8 @@ def pagina() -> None:
     with col2:
         with st.container(border=True):
             st.subheader("Distribución por tipo de contrato")
-            contratos = df["contract_type"].fillna("No especificado").value_counts()
+            contratos = (df["contract_type"].fillna("No especificado")
+                         .replace({"permanent": "Indefinido", "contract": "Temporal"}).value_counts())
             if not contratos.empty:
                 fig = px.pie(contratos, names=contratos.index,
                              values=contratos.values, hole=0.4)

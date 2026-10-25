@@ -9,7 +9,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from paginas.comunes import filtros_basicos
+from paginas.comunes import barra_h, filtros_basicos
 
 
 def _ciudad(area_json: str, display: str) -> str:
@@ -42,8 +42,7 @@ def pagina() -> None:
     with st.container(border=True):
         st.subheader("Volumen de ofertas por país")
         conteo = (df["pais_nombre"].value_counts().sort_values(ascending=True))
-        fig = px.bar(conteo, orientation="h",
-                     labels={"value": "Ofertas", "index": "País"})
+        fig = barra_h(conteo, "Ofertas", "País")
         fig.update_layout(height=420, margin=dict(l=10, r=10, t=30, b=10))
         st.plotly_chart(fig, width="stretch")
 
@@ -53,8 +52,7 @@ def pagina() -> None:
             st.subheader("Ciudades con más ofertas")
             top_ciudades = df["ciudad"].value_counts().head(15)
             if not top_ciudades.empty:
-                fig = px.bar(top_ciudades.sort_values(), orientation="h",
-                             labels={"value": "Ofertas", "index": "Ciudad"})
+                fig = barra_h(top_ciudades.sort_values(), "Ofertas", "Ciudad")
                 fig.update_layout(height=500,
                                   margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, width="stretch")
@@ -67,8 +65,7 @@ def pagina() -> None:
             sectores = (df["category_label"].fillna("No especificado")
                         .value_counts().head(12))
             if not sectores.empty:
-                fig = px.bar(sectores.sort_values(), orientation="h",
-                             labels={"value": "Ofertas", "index": "Sector"})
+                fig = barra_h(sectores.sort_values(), "Ofertas", "Sector")
                 fig.update_layout(height=500,
                                   margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, width="stretch")
@@ -81,7 +78,6 @@ def pagina() -> None:
         top_empresas = (df["company"].fillna("No especificada")
                         .value_counts().head(15))
         if not top_empresas.empty:
-            fig = px.bar(top_empresas.sort_values(), orientation="h",
-                         labels={"value": "Ofertas", "index": "Empresa"})
+            fig = barra_h(top_empresas.sort_values(), "Ofertas", "Empresa")
             fig.update_layout(height=500, margin=dict(l=10, r=10, t=30, b=10))
             st.plotly_chart(fig, width="stretch")

@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from paginas.comunes import filtros_basicos
+from paginas.comunes import barra_h, filtros_basicos
 from skills import detectar_rol
 
 
@@ -57,9 +57,7 @@ def pagina() -> None:
             if not roles.empty:
                 mediana = (roles.groupby("rol")["salario_medio"]
                            .median().sort_values(ascending=True))
-                fig = px.bar(mediana, orientation="h",
-                             labels={"value": "Mediana salarial (EUR)",
-                                     "index": "Rol"})
+                fig = barra_h(mediana, "Mediana salarial (EUR)", "Rol")
                 fig.update_layout(height=420,
                                   margin=dict(l=10, r=10, t=30, b=10))
                 st.plotly_chart(fig, width="stretch")

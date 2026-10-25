@@ -9,7 +9,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from paginas.comunes import filtros_basicos
+from paginas.comunes import barra_h, filtros_basicos
 from skills import detectar_rol, detectar_skills
 
 
@@ -39,8 +39,7 @@ def pagina() -> None:
 
     with st.container(border=True):
         st.subheader("Top 20 habilidades más demandadas")
-        fig = px.bar(top.sort_values(), orientation="h",
-                     labels={"value": "Ofertas", "index": "Skill"})
+        fig = barra_h(top.sort_values(), "Ofertas", "Skill")
         fig.update_layout(height=600, margin=dict(l=10, r=10, t=30, b=10))
         st.plotly_chart(fig, width="stretch")
 
